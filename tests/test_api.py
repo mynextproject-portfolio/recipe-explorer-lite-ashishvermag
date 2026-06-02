@@ -3,6 +3,9 @@ Basic smoke and contract tests for Recipe Explorer API.
 These tests verify that endpoints exist and return expected status codes.
 """
 
+import importlib
+import warnings
+
 def test_health_check(client):
     """Smoke test: API is running and responding"""
     response = client.get("/health")
@@ -67,3 +70,19 @@ def test_recipe_pages_load(client, clean_storage, sample_recipe_data):
     # Test import page
     response = client.get("/import")
     assert response.status_code == 200
+
+
+def test_no_deprecation_warnings_on_reload():
+    """Regression test: reloading app modules should not emit deprecation warnings."""
+    import app.models as models
+    import app.routes.pages as pages
+    import app.services.storage as storage
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always", category=DeprecationWarning)
+        importlib.reload(models)
+        importlib.reload(pages)
+        importlib.reload(storage)
+
+    deprecations = [str(w.message) for w in caught if issubclass(w.category, DeprecationWarning)]
+    assert deprecations == [], f"Deprecation warnings found: {deprecations}"
