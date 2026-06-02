@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Form, HTTPException, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import List, Optional
+import re
 from app.models import RecipeCreate, RecipeUpdate
 from app.services.storage import recipe_storage
 
@@ -67,6 +68,7 @@ def create_recipe_form(
     difficulty: str = Form(...),
     ingredients: str = Form(...),
     instructions: str = Form(...),
+    cuisine: str = Form(""),
     tags: str = Form(...)
 ):
     """Handle new recipe form submission"""
@@ -85,13 +87,16 @@ def create_recipe_form(
         
         if not instructions.strip():
             raise ValueError("Instructions are required")
-        
+        # Split instructions into steps by blank lines
+        steps = [s.strip() for s in re.split(r'\n\s*\n', instructions.strip()) if s.strip()]
+
         recipe_data = RecipeCreate(
             title=title,
             description=description,
             difficulty=difficulty,
             ingredients=ingredient_list,
-            instructions=instructions.strip(),
+            instructions=steps,
+            cuisine=cuisine or "",
             tags=tag_list
         )
         
@@ -116,6 +121,7 @@ def update_recipe_form(
     difficulty: str = Form(...),
     ingredients: str = Form(...),
     instructions: str = Form(...),
+    cuisine: str = Form(""),
     tags: str = Form(...)
 ):
     """Handle edit recipe form submission"""
@@ -133,13 +139,16 @@ def update_recipe_form(
             
         if not instructions.strip():
             raise ValueError("Instructions are required")
-        
+        # Split instructions into steps by blank lines
+        steps = [s.strip() for s in re.split(r'\n\s*\n', instructions.strip()) if s.strip()]
+
         recipe_data = RecipeUpdate(
             title=title,
             description=description,
             difficulty=difficulty,
             ingredients=ingredient_list,
-            instructions=instructions.strip(),
+            instructions=steps,
+            cuisine=cuisine or "",
             tags=tag_list
         )
         
