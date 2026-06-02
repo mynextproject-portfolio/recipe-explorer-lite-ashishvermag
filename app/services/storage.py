@@ -64,6 +64,15 @@ class RecipeStorage:
                     recipe_dict['created_at'] = datetime.fromisoformat(recipe_dict['created_at'])
                 if 'updated_at' in recipe_dict:
                     recipe_dict['updated_at'] = datetime.fromisoformat(recipe_dict['updated_at'])
+                # Normalize instructions: accept either str or list[str]
+                if 'instructions' in recipe_dict and isinstance(recipe_dict['instructions'], str):
+                    # Split on blank lines to create steps
+                    import re
+                    steps = [s.strip() for s in re.split(r"\n\s*\n", recipe_dict['instructions']) if s.strip()]
+                    recipe_dict['instructions'] = steps
+                # Ensure cuisine exists
+                if 'cuisine' not in recipe_dict:
+                    recipe_dict['cuisine'] = ""
                 
                 recipe = Recipe(**recipe_dict)
                 self.recipes[recipe.id] = recipe

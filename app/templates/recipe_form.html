@@ -45,6 +45,13 @@
             </div>
             
             <div class="mb-3">
+                <label for="cuisine" class="form-label">Cuisine</label>
+                <input type="text" class="form-control" id="cuisine" name="cuisine"
+                       value="{% if recipe and recipe.cuisine %}{{ recipe.cuisine }}{% endif %}"
+                       placeholder="e.g. Italian, Mexican">
+            </div>
+            
+            <div class="mb-3">
                 <label for="tags" class="form-label">Tags (comma-separated)</label>
                 <input type="text" class="form-control" id="tags" name="tags" 
                        value="{% if recipe %}{{ recipe.tags|join(', ') }}{% endif %}"
@@ -86,7 +93,7 @@
             <div class="mb-4">
                 <label for="instructions" class="form-label">Instructions</label>
                 <textarea class="form-control" id="instructions" name="instructions" rows="8" required 
-                          placeholder="Enter complete cooking instructions...">{% if recipe %}{{ recipe.instructions }}{% endif %}</textarea>
+                          placeholder="Enter instructions. Separate steps with a blank line.">{% if recipe %}{{ recipe.instructions|join('\n\n') }}{% endif %}</textarea>
             </div>
             
             <!-- Submit Buttons -->

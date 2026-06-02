@@ -40,6 +40,9 @@ def test_create_and_get_recipe(client, clean_storage, sample_recipe_data):
     assert "title" in recipe
     assert "created_at" in recipe
     assert recipe["title"] == sample_recipe_data["title"]
+    # New schema: instructions should be a list of steps and cuisine should be present
+    assert "instructions" in recipe and isinstance(recipe["instructions"], list)
+    assert recipe.get("cuisine") == sample_recipe_data.get("cuisine")
     
     # Get recipe
     get_response = client.get(f"/api/recipes/{recipe['id']}")
